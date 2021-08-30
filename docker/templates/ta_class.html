@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!-- WordCloud -->
+    <!-- <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-tag-cloud.min.js"></script> -->
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayTAClassPage()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <div class="container page-container">
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+        
+        <!-- Back button -->
+        <div class="back-btn-container">
+            <a href="ta_home.html"><img id="back-arrow" src="images/back_arrow.svg">GO BACK</a>
+        </div>
+        
+        <!-- Main Content -->
+        <section class="container class-container">
+            <div id="class-header"></div>
+            
+            <div class="card card-container">
+                <div class="card-header">Sessions</div>
+                <div class="card-body session-card-body">
+                    <div id="session-container" class="row session-container"></div>
+                    <button class="btn btn-primary add-session-btn" data-bs-toggle="modal" data-bs-target="#create-session">Add</button>
+                </div>
+            </div>
+            
+            <div>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Class List</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="configurations-tab" data-bs-toggle="tab" data-bs-target="#configurations" type="button" role="tab" aria-controls="profile" aria-selected="false">Configurations</button>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tab-content card-container mt-0 ta-dashboard">
+                <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div id="classlist-container" class="classlist"></div>
+                    <div class="mt-4 classlist-btn-container">
+                        <div class="w-50">
+                            <button id="add-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-enrolment">Add</button>
+                            <button id="drop-btn" class="btn btn-primary" onclick="dropEnrolment()">Drop</button>
+                            <button id="done-btn" class="btn btn-outline-primary" onclick="doneEditing()">Done</button>
+                            <button id="import-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#import-classlist">Import</button>
+                            <button id="export-btn" class="btn btn-primary" onclick="exportClasslist()">Export</button>
+                        </div>
+                        <div class="w-50">
+                            <button id="edit-score-btn" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#edit-score" onclick="fillEditScoreForm()">Edit Score</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane" id="configurations" role="tabpanel" aria-labelledby="configurations-tab">
+                    <form id="update-config-form" class="row g-3 mx-0">
+                        <div class="col-3 p-0">
+                            <label for="#score-limit" class="form-label"><overline class="modal-form-label">Participation Limit</overline></label>
+                        </div>
+                        <div class="col-9">
+                            <input id="score-limit" class="w-25 form-control config-textbox" type="number" min="1" name="limit" required>
+                            <alert id="limit-error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Same as current limit.</c1></alert>
+                        </div>
+                        <div class="col-12 p-0">
+                            <button class="btn btn-primary" type="submit">Save Changes</button>
+                            <alert id="error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when saving configurations.</c1></alert>
+                            <alert id="success-msg" class="alert-positive"><img class="alert-icon" src="images/tick.svg" alt=""><c1>Configurations successfully saved!</c1></alert>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Import Classlist Modal  -->
+    <div class="modal fade" id="import-classlist" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="import-classlist-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="import-classlist-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="import-classlist-label">Import Class List</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- <label class="classlist-file-upload">
+                                <input type="file" id="classlist-file" required>
+                                CHOOSE FILE
+                            </label> -->
+                            <alert id="import-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when importing class list.</c1></alert>
+                            <input type="file" id="classlist-file" class="form-control" required>
+                            <div id="upload-info" class="mt-4 mb-2">Please be patient, this may take up to a few minutes...</div>
+                        </div>
+                        <div class="modal-footer">
+                            <div id="import-error-msg" class="text-danger error-msg""></div>
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Import</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Session Modal  -->
+    <div class="modal fade" id="create-session" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="create-session-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="create-session-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-session-label">Add New Session</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="sessionExist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Session already exists.</c1></alert>
+                            <alert id="sessionError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when adding session.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#sessNo" class="form-label"><overline class="modal-form-label">Select Week</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <select class="form-control" name="sessNo" id="sessNo" required>
+                                        <option id="1" value="1">1</option>
+                                        <option id="2" value="2">2</option>
+                                        <option id="3" value="3">3</option>
+                                        <option id="4" value="4">4</option>
+                                        <option id="5" value="5">5</option>
+                                        <option id="6" value="6">6</option>
+                                        <option id="7" value="7">7</option>
+                                        <option id="8" value="8">8</option>
+                                        <option id="9" value="9">9</option>
+                                        <option id="10" value="10">10</option>
+                                        <option id="11" value="11">11</option>
+                                        <option id="12" value="12">12</option>
+                                        <option id="13" value="13">13</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="#date"><overline class="modal-form-label">Select Date</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <input type="date" id="date" name="date" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Session</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Session Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-session" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-session-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-session-label">Confirm Delete Session</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                        <s2>This action cannot be undone.</s2>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDelete(); refreshSocket();">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Enrolment Modal  -->
+    <div class="modal fade" id="add-enrolment" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="add-enrolment-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="add-enrolment-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="add-enrolment-label">Add New Enrolment</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="enrolmentExist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Enrolment already exists.</c1></alert>
+                            <alert id="enrolmentError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when adding enrolment.</c1></alert>
+                            <div class="row g-3 text-start mx-auto">
+                                <div class="col-4">
+                                    <label for="#studentName" class="form-label"><overline class="modal-form-label">Student Name</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <input type="text" id="studentName" name="studentName" class="form-control" required>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="#studentEmail"><overline class="modal-form-label">Student Email</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <input type="email" id="studentEmail" name="studentEmail" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Enrolment</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Enrolment Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-enrolment" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-enrolment-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-enrolment-label">Confirm Delete Enrolment</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="container mx-auto text-start">
+                                <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                                <s2>This action cannot be undone.</s2>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button id="confirm-delete-enrolment-btn" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Score Modal  -->
+    <div class="modal fade" id="edit-score" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="edit-score-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="edit-score-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="edit-score-label">Edit Class Participation Score</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="attend-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Student has not attended the session.</c1></alert>
+                            <alert id="editError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when editing score.</c1></alert>
+                            <div class="row g-3 text-start mx-auto">
+                                <div class="col-4">
+                                    <label for="#editStudentEmail"><overline class="modal-form-label">Select Student</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <select id="editStudentEmail" name="studentEmail" class="form-control" required></select>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="#editSessNo"><overline class="modal-form-label">Select Week</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <select id="editSessNo" name="sessNo" class="form-control" required></select>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="#score"><overline class="modal-form-label">New Score</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <input type="number" id="score" name="score" class="form-control" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Confirm Score</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>  
+        
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/ta_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    <script src="js/taClass.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.modal-alert').hide();
+        });
+        
+        const importClasslistForm = document.getElementById('import-classlist-form')
+        importClasslistForm.addEventListener("submit", function(event) {
+            loadingPointer();
+            event.preventDefault();
+            document.getElementById("upload-info").style.display = "block";
+            const url = dns + importPort + "/importClasslist";
+            const file = document.getElementById("classlist-file").files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = async function(event) {
+                    var content = event.target.result;
+                    var rowsObj = [];
+                    var headers = content.split("\n")[0].split(",");
+                    var body = content.split("\n").slice(1);
+                    
+                    for(var i = 0; i < body.length; i++) {
+                        var data = body[i].replace("\r","").split(",");
+                        var weeks = {}
+                        var obj = {};
+                        for(var j = 0; j < data.length; j++) {
+                            if (j < 2) {
+                                obj[headers[j].trim()] = data[j].trim();
+                            }
+                            else {
+                                weeks[headers[j].trim()] = data[j].trim();
+                            }
+                        }
+                        obj.weeks = weeks;
+                        rowsObj.push(obj);
+                    }               
+                    console.log(rowsObj);
+                    const section = JSON.parse(sessionStorage.getItem("section"));
+                    // const identity = sessionStorage.getItem("identity");
+                    // const userEmail = JSON.parse(sessionStorage.getItem(identity)).email;
+                    section.classlist = rowsObj;
+                    section.identity = identity;    // from taClass.js
+                    section.identityEmail = userEmail;  // from taClass.js
+                    console.log(section);
+                    const response = await fetch(url, {
+                        method: "POST",
+                        mode: "cors", 
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify(section)
+                    });
+
+                    if (!response.ok) {
+                        const errorMessage = await response.text();
+                        throw new Error(errorMessage);
+                    }
+                    refreshSocket();
+                    location.reload();
+                };
+                reader.onerror = function(event) {
+                    defaultPointer();
+                    showModalAlert("import");
+                };
+                reader.readAsBinaryString(file);
+            }
+        });
+        
+        const createSessionForm = document.getElementById("create-session-form");
+        createSessionForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            plainFormData["acadYear"] = acadYear;
+            plainFormData["termNo"] = termNo;
+            plainFormData["courseCode"] = courseCode;
+            plainFormData["sectionNo"] = sectionNo;
+            const jsonFormData = JSON.stringify(plainFormData);
+            const getSessionUrl = dns + sessionPort + "/getSession" + "/" + plainFormData.acadYear + "/" + plainFormData.termNo + "/" + plainFormData.courseCode + "/" + plainFormData.sectionNo + "/" + plainFormData.sessNo;  
+            try {
+                const getSessionData = await sendGetRequest(getSessionUrl);
+                if (getSessionData.code == 200) {
+                    showModalAlert("sessionExist");
+                }
+                else if ((getSessionData.code == 404)){
+                    const addSessionUrl = dns + sessionPort + "/addSession";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addSessionData = await sendPostRequest(addSessionUrl, jsonFormData);
+                        refreshSocket();
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                        showModalAlert("sessionError");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("sessionError");
+            }
+        });
+        
+        const addEnrolmentForm = document.getElementById("add-enrolment-form");
+        addEnrolmentForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            plainFormData["acadYear"] = acadYear;
+            plainFormData["termNo"] = termNo;
+            plainFormData["courseCode"] = courseCode;
+            plainFormData["sectionNo"] = sectionNo;
+            const getStudentUrl = dns + userPort + "/getStudent" + "/" + plainFormData.studentEmail;  
+            try {
+                const getStudentData = await sendGetRequest(getStudentUrl);
+                if (getStudentData.code == 404) {
+                    const addStudentUrl = dns + accountPort + "/createStudentAccount";
+                    const jsonFormData = JSON.stringify({
+                        "email": plainFormData.studentEmail,
+                        "name": plainFormData.studentName,
+                    });
+                    try {
+                        const addStudentData = await sendPostRequest(addStudentUrl, jsonFormData);
+                    } catch (error) {
+                        defaultPointer();
+                        console.log(error);
+                        showModalAlert("enrolmentError");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            }
+            const jsonFormData = JSON.stringify(plainFormData);
+            const getEnrolmentUrl = dns + userPort + "/getEnrolment" + "/" + plainFormData.acadYear + "/" + plainFormData.termNo + "/" + plainFormData.courseCode + "/" + plainFormData.sectionNo + "/" + plainFormData.studentEmail;  
+            try {
+                const getEnrolmentData = await sendGetRequest(getEnrolmentUrl);
+                if (getEnrolmentData.code == 200) {
+                    defaultPointer();
+                    showModalAlert("enrolmentExist");
+                }
+                else if ((getEnrolmentData.code == 404)){
+                    const addEnrolmentUrl = dns + userPort + "/addEnrolment";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addEnrolmentData = await sendPostRequest(addEnrolmentUrl, jsonFormData);
+                        refreshSocket();
+                        location.reload();
+                    } catch (error) {
+                        defaultPointer();
+                        console.log(error);
+                        showModalAlert("enrolmentError");
+                    }
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("enrolmentError");
+            }
+        });
+        
+        const editScoreForm = document.getElementById("edit-score-form");
+        editScoreForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const section = JSON.parse(sessionStorage.getItem("section"));
+            const user = sessionStorage.getItem("identity");
+            const userEmail = JSON.parse(sessionStorage.getItem(user)).email;
+            let dateTime = new Date();
+            dateTime.setTime(dateTime.getTime() + 8*60*60*1000);
+            const url = dns + updateCpPort + "/updateStudentSessionCPScore/" + section.acadYear + "/" + section.termNo + "/" + section.courseCode + "/" + section.sectionNo + "/" + plainFormData.sessNo + "/" + plainFormData.studentEmail + "/" + plainFormData.score + "/" + dateTime.toISOString().slice(0,-1) + "/" + user + "/" + userEmail;
+            try {
+                const responseData = await sendPutRequest(url);
+                if (responseData.code == 200) {
+                    refreshSocket();
+                    location.reload();
+                }
+                else if (responseData.code == 404) {
+                    defaultPointer();
+                    showModalAlert("attend");
+                }
+                else {
+                    showModalAlert("editError");
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("editError");
+            }
+        });
+        
+        const updateConfigForm = document.getElementById("update-config-form");
+        updateConfigForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const limit = plainFormData.limit;
+            let section = JSON.parse(sessionStorage.getItem("section"));
+            if (limit == section.participationScoreLimit) {
+                showAlert("limit");
+            }
+            else {
+                const url = dns + sectionPort + "/updateSectionConfig/" + section.acadYear + "/" + section.termNo + "/" + section.courseCode + "/" + section.sectionNo + "?participationScoreLimit=" + limit;
+                try {
+                    const responseData = await sendPutRequest(url);
+                    if (responseData.code == 200) {
+                        refreshSocket();
+                        section.participationScoreLimit = limit;
+                        sessionStorage.setItem("section", JSON.stringify(section));
+                        showAlert("success");
+                    }
+                } catch (error) {
+                    console.log(error);
+                    showAlert("error");
+                }
+            }
+        });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>    
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayStudentSessionPage()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+
+    <div class="container page-container">
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+        
+        <!-- Back button -->
+        <div class="back-btn-container">
+            <a href="student_class.html"><img id="back-arrow" src="images/back_arrow.svg">GO BACK</a>
+        </div>
+        
+        <!-- Main Content -->
+        <section class="container class-container">
+            <div id="session-header"></div>
+
+            <div class="card card-container">
+                <div class="card-header">Participate</div>
+                <div class="card-body">
+                    <button id="hand" class="btn btn-primary">
+                        <img src="images/hand.svg" id="hand-icon">Raise Hand
+                    </button>
+                    <alert id="waiting-status" class="alert-waiting"><img class="alert-icon" src="images/pause.svg" alt=""><c1>Your hand is raised! Waiting to be called...</c1></alert>
+                    <alert id="accepted-status" class="alert-positive"><img class="alert-icon" src="images/tick.svg" alt=""><c1>You have been selected to answer!</c1></alert>
+                    <alert id="invalidated-status" class="alert-negative"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Your answer has been invalidated. Please try again.</c1></alert>
+                    <alert id="bonus-status" class="alert-bonus"><img class="alert-icon" src="images/star.svg" alt=""><c1>You were awarded bonus points for your SKOR-grade answer!</c1></alert>
+                </div>
+            </div>
+
+            <div class="card card-container">
+                <div class="card-header">Weekly Class Participation Scores</div>
+                <div class="card-body">
+                    <div>Total: <span id="total-score"></span></div>
+                    <div id="chart-container">
+                        <canvas id="score-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/student_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    <script src="js/studentSession.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

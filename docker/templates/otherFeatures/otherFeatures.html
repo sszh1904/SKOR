@@ -1,0 +1,158 @@
+<!-- ***********************  GENERAL  *********************** -->
+<!-- Success Modal -->
+<div class="modal fade mx-auto" id="success" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="success-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="success-label">Success</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <div class="container mx-auto text-start">
+                        <h5 id="success-text"></h5>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success" data-bs-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ***********************  ADMIN  *********************** -->
+<!-- Create TA Modal  -->
+<div class="modal fade" id="create-ta" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="create-ta-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="create-ta-form" action="#">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="create-ta-label">Create New Teaching Assistant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 text-start mx-auto">
+                        <div class="col-3">
+                            <label for="#taName">Name:</label>
+                        </div>
+
+                        <div class="col-9">
+                            <input type="text" id="taName" name="name" required>
+                        </div>
+
+                        <div class="col-3">
+                            <label for="#taEmail">Email:</label>
+                        </div>
+
+                        <div class="col-9">
+                            <input type="email" id="taEmail" name="email" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div id="ta-error-msg" class="text-danger"></div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create TA</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Update TA Modal  -->
+<div class="modal fade" id="update-ta" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="update-ta-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="update-ta-form" action="#">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="update-ta-label">Student <span id="displayTAEmail"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 text-start mx-auto">
+                        <div class="col-3">
+                            <label for="#studentName">Name:</label>
+                        </div>
+
+                        <div class="col-9">
+                            <input type="text" id="updateTAName" name="name" required>
+                        </div>
+
+                        <input type="hidden" id="updateTAEmail" name="email">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div id="update-error-msg" class="text-danger error-msg""></div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update TA</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ***********************  STUDENT  *********************** -->
+<li class="nav-item" role="presentation">
+    <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#records" type="button" role="tab" aria-controls="messages" aria-selected="false">Records</button>
+</li>
+
+<!-- ***********************  TA  *********************** -->
+<li class="nav-item" role="presentation">
+    <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="messages" aria-selected="false">Analytics</button>
+</li>
+
+<li class="nav-item" role="presentation">
+    <button class="nav-link" id="import-tab" data-bs-toggle="tab" data-bs-target="#import" type="button" role="tab" aria-controls="profile" aria-selected="false">Import</button>
+</li>
+
+<div class="tab-pane" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+    <div class="container my-4">
+        <div class="float-end">
+            <label for="week">Week:</label>
+            <select class="mx-2" id="week" onchange="displayWordCloud(this.value)"></select>
+        </div>
+        <div id="word-cloud"></div>
+    </div>
+</div>
+
+<div class="tab-pane" id="import" role="tabpanel" aria-labelledby="import-tab">
+    <div class="container my-4 w-75">
+        <form method="post" action="#" id="import-chat-form">
+            <div class="my-4">
+                <h3>Import Zoom Chat</h3>
+            </div>
+            <div class="my-3 d-flex">
+                <label for="import-week">Week:</label> 
+                <select id="import-week" class="mx-2" name="week" required></select>
+            </div>
+            <div id="upload-chat" class="form-group files">
+                <input id="chat-file" type="file" class="form-control" required>
+            </div>
+            <div class="my-3">
+                <button class="btn btn-primary" type="submit">Import</button>
+            </div>
+        </form> 
+    </div>
+</div>
+
+<div id="alert-container" class="container my-2 text-center alert-container">
+    <div class="alert alert-success" role="alert">
+        You added 1 point to Liu Jing Xuan!
+    </div>
+    <div class="alert alert-danger" role="alert">
+        You deducted 1 point from Liu Jing Xuan!
+    </div>
+</div>
+
+<div id="upload-classlist" class="container w-75 mx-auto">
+    <form method="post" action="#" id="upload-classlist-form">
+        <div class="my-4">
+            <h3>Upload Class List</h3>
+        </div>
+        <div class="form-group files">
+            <input id="classlist-file" type="file" class="form-control" required>
+        </div>
+        <div class="my-3">
+            <button class="btn btn-primary" type="submit">Upload</button>
+        </div>
+    </form> 
+</div>

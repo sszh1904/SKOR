@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayAllTerms()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <div class="container page-container">
+        
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+
+        <!-- Main Content -->
+        <div id="term-container" class="module-container row"></div>
+    </div>
+
+    <!-- Add New Term Modal -->
+    <div class="modal fade" id="create-term" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="create-term-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="create-term-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-term-label">Add New Term</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="exist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Term already exists.</c1></alert>
+                            <alert id="error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating term.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#acadYear"><overline class="modal-form-label">Academic Year</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="acadYear" class="form-control" name="acadYear" value="AY2021-22" required>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#termNo"><overline class="modal-form-label">Term No</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select id="termNo" class="form-control" name="termNo" required>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3a">3a</option>
+                                        <option value="3b">3b</option>
+                                        <option value="3c">3c</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#termStart"><overline class="modal-form-label">Start Date</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="date" id="startDate" class="form-control" name="startDate" onchange="setMinEndDate(this.value)" required>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#termEnd"><overline class="modal-form-label">End Date</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="date" id="endDate" class="form-control" name="endDate" onchange="setMaxStartDate(this.value)" required>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#isCurrent"><overline class="modal-form-label">Set Current</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <label for="#isCurrent"  class="table-checkbox-container"><input id="isCurrent" name="isCurrent" type="checkbox" class="table-checkbox"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Term</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-term" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-term-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-term-label">Confirm Delete Term</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="container mx-auto text-start">
+                                <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                                <s2>This action cannot be undone.</s2>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/admin_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.modal-alert').hide();
+        });
+        
+        const createTermForm = document.getElementById("create-term-form");
+        createTermForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const getTermUrl = dns + termPort + "/getTerm" + "/" + plainFormData.acadYear + "/" + plainFormData.termNo;
+            try {
+                const getTermData = await sendGetRequest(getTermUrl);
+                if (getTermData.code == 200) {
+                    showModalAlert("exist");
+                }
+                else if ((getTermData.code == 404)){
+                    const addTermUrl = dns + termPort + "/addTerm";
+                    const isCurrent = document.getElementById('isCurrent').checked;
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addTermData = await sendPostRequest(addTermUrl, jsonFormData);
+                        if (isCurrent) {
+                            updateTerm(addTermData.data.acadYear, addTermData.data.termNo);
+                        }
+                        else {
+                            location.reload();
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        showModalAlert("error");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("error");
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

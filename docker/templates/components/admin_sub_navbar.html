@@ -1,0 +1,23 @@
+<sub-navbar>
+    <a id="sub-nav-home" href="admin_home.html">Terms</a>
+    <a id="sub-nav-course" href="admin_course.html">Courses</a>
+    <a id="sub-nav-faculty" href="admin_faculty.html">Faculty</a>
+    <a id="sub-nav-instructor" href="admin_instructor.html">Instructors</a>
+    <a id="sub-nav-ta" href="admin_ta.html">Teaching Assistants</a>
+    <a id="sub-nav-student" href="admin_student.html">Students</a>
+</sub-navbar>
+
+<script>
+    // Add "active" class to current page sub-navlink
+    const subNavPath = window.location.pathname;
+    const subNavPage = subNavPath.split("/").pop();
+    selectSubNav(subNavPage.split(".")[0]);
+
+    function selectSubNav(subNav) {
+        if (subNav == "admin_term" || subNav == "admin_course_offering") {
+            subNav = "admin_home";
+        }
+        subNav = subNav.split("_")[1];
+        document.getElementById("sub-nav-" + subNav).classList.add("active");
+    }
+</script>

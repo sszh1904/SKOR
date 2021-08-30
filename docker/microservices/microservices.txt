@@ -1,0 +1,172 @@
+## API ENDPOINTS ##
+
+<!------- ATOMIC ---------!>
+Admin:
+- Add new Admin
+- Get an Admin
+- Update Admin information
+- Update Admin password
+- Delete an Admin
+
+Student:
+- Add a Student
+- Get a Student
+- Get all Student
+- Update Student information
+- Update Student password
+- Delete a Student
+
+Faculty:
+- Add a Faculty
+- Get a Faculty
+- Get all Faculty
+- Update Faculty information
+- Update Faculty password
+- Delete a Faculty
+
+Instructor:
+- Add an Instructor
+- Get an Instructor
+- Get all Instructor
+- Update Instructor information
+- Update Instructor password
+- Delete an Instructor
+
+TATerm:
+- Add a TA in a Term
+- Get a TA in a Term
+- Get all TA in a Term
+- Delete a TA in a Term
+
+Enrolment:
+- Add new Enrolmemnt
+- Add new Enrolment in bulk
+- Get an Enrolment
+- Get Enrolments by Section (class list)
+- Get all Enrolment by a Student in a Term
+- Delete an Enrolment
+- Delete all Enrolments in a Section
+
+Term:
+- Add new Term
+- Get all Terms
+- Get a Term
+- Get current Term
+- Update isCurrent for a Term
+- Update Term information (attributes)
+- Delete a Term
+
+Course:
+- Add new Course
+- Get a Course
+- Get all Courses
+- Update Course information (attributes)
+- Delete a Course
+
+CourseOffering:
+- Add new CourseOffering
+- Get CourseOffering
+- Get CourseOfferings by Term
+- Update CourseOffering information (attributes)
+- Delete CourseOffering
+
+Section:
+- Add a Section
+- Get a Section
+- Get all Sections by Course in a Term
+- Get all Sections by TA in a Term
+- Get all Sections by Faculty in a Term
+- Get all Sections by Instructor in a Term
+- Update Section configurations/info (attributes)
+- Delete a Section
+
+PriorityCall:
+- Add new PriorityCall
+- Get all PriorityCalls in a Session
+- Delete a PriorityCall
+
+Session:
+- Add a Session
+- Create all Sessions for a Section
+- Get a Session
+- Get all Sessions for a section
+- Get number of Sessions for a Section
+- Get available Session for a Section
+- Update Session information
+- Update Session availability 
+- Delete a Session
+
+Participation:
+- Add new Participation
+- Get a Participation
+- Get all Participations in a Session
+- Get all Participations by a Student in a Session
+- Get all raise hand in a Session
+- Get all raise hand by student in a Session
+- Get all raise hand by student in a Section
+- Award Participation (Accept raisehand)
+- Invalidate Participation
+- Award Bonus Participation
+- Delete a Participation
+
+StudentSessionScore:
+- Add a StudentSessionScore
+- Add new StuentSessionScore in bulk
+- Create all StudentSessionScore for a Student in a Section
+- Get a participation score for a Student in a Session
+- Get total participation score for a Student in a Section
+- Get all participation score for a Student in a Section
+- Plus participation score for a Student in a Session
+- Minus participation score for a Student in a Session
+- Update StudentSessionScore for a Student from the UI table (manual update)
+- Update StudentSessionScore in bulk
+
+ParticipationScoreLog:
+- Add new Participation Log
+- Add new StudentSessionScore Log
+- Add StudentSessionScore Log in bulk
+
+SkorEmail:
+- Add a SkorEmail
+- Get a SkorEmail
+- Get selected SkorEmail
+- Get all SkorEmail
+- Update selected SkorEmail
+- Delete SkorEmail
+
+Configuration:
+- Get configuration
+- Update test mode
+
+
+<!------- COMPOSITE ---------!>
+Account:
+- Login Authentication
+- Reset Password
+- Create Student Account
+- Create Faculty Account
+- Create Instructor Account
+
+Import:
+- Import classlist and score
+- Import Student list
+- Import Faculty list
+- Import Instructor list
+
+DisplayInfo:
+- Get Section Information (with Course name)
+- Get Sections Information by Course (with Faculty & Instructor name)
+- Get Sections Information by Term and TA (with Course name)
+- Get Sections Information by Term and Faculty (with Course name)
+- Get Sections Information by Term and Instructor (with Course name)
+- Get PriorityCall Information by Section (with Student name)
+
+UpdateCP:
+- Accept raise hand
+- Invalidate class participation
+- Award bonus class participation
+- Update StudentSessionScore (manual edit)
+
+ContactSkor:
+- Report Issue
+- Contact Us

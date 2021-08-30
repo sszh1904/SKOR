@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayAllTA()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <div class="container page-container">
+
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+
+        <div class="text-end">
+            <!-- Create Course Modal Button -->
+            <button class="btn btn-primary d-inline-block" data-bs-toggle="modal" data-bs-target="#add-ta">Add</button>
+        </div>
+
+        <!-- Main Content -->
+        <div id="ta-container" class="module-container row"></div>
+    </div>
+    
+    <!-- Add New TA Modal -->
+    <div class="modal fade" id="add-ta" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="add-ta-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="add-ta-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="add-ta-label">Add New TA</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="exist-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>TA already exists.</c1></alert>
+                            <alert id="error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when adding TA.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#ta"><overline class="modal-form-label">Select Name</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <select id="ta" class="form-control" name="email"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add TA</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-ta" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-ta-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-ta-label">Confirm Delete TA</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="container mx-auto text-start">
+                                <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                                <s2>This action cannot be undone.</s2>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/admin_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.modal-alert').hide();
+        });
+        
+        const addTAForm = document.getElementById("add-ta-form");
+        addTAForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const term = JSON.parse(sessionStorage.getItem("term"));
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            plainFormData.acadYear = term.acadYear;
+            plainFormData.termNo = term.termNo;
+            const getTAUrl = dns + userPort + "/getTA" + "/" + plainFormData.email + "/" + plainFormData.acadYear + "/" + plainFormData.termNo;
+            try {
+                const getTAData = await sendGetRequest(getTAUrl);
+                if (getTAData.code == 200) {
+                    showModalAlert("exist");
+                }
+                else if ((getTAData.code == 404)){
+                    const addTAUrl = dns + userPort + "/addTA";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addTAData = await sendPostRequest(addTAUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                        showModalAlert("error");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("error");
+            }
+        });
+    </script>   
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

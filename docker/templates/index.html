@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="page background">
+        <!--Navigation Bar-->
+        <div id="nav-placeholder"></div>
+        
+        <!-- Main Content -->
+        <section class="container login">
+            <div class="container login-container">
+                <alert id="login-alert" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1 id="login-alert-text"></c1></alert>
+                <form id="login-form" class="login-form">
+                    <div class="row mx-0">
+                        <div class="input-group ">
+                            <span class="input-group-text login-input" id="username"><img class="login-form-icon" src="images/mail.svg" alt="mail"></span>
+                            <input id="login-email" name="email" type="email" class="form-control login-input" placeholder="Email" required>
+                        </div>
+                    </div>
+                    <div class="row mx-0">
+                        <div class="input-group ">
+                            <span class="input-group-text login-input" id="password"><img class="login-form-icon" src="images/key.svg" alt="key"></span>
+                            <input id="login-password" name="password" type="password" class="form-control login-input" placeholder="Password" required>
+                        </div>
+                        <div class="mt-2 text-start">
+                            <a class="login-link" href="#" data-bs-toggle="modal" data-bs-target="#reset-password">Forgot your password?</a>
+                        </div>
+                    </div>
+                    <div class="row mx-0 mb-3">
+                        <button class="btn btn-login" type="submit">Login</button>
+                    </div>
+                </form>
+                
+                <div id="continue-login" >
+                    <div class="row mb-3">
+                        <button class="btn btn-choose-user" onclick="goToHome()">Continue as <span id="accountName"></span></button>
+                    </div>
+                    <div class="row">
+                        <button class="btn btn-outline-login" onclick="logout()">Login as another user</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Report Issue -->
+        <div id="report-issue-placeholder"></div>
+        
+        <!-- Reset Password Modal -->
+        <div class="modal fade" id="reset-password" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="reset-password-label" aria-hidden="true">
+            <div class="vertical-alignment-helper">
+                <div class="modal-dialog vertical-align-center">
+                    <form id="reset-password-form">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="reset-password-label">Reset Password</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="reset-password-content" class="row g-2 text-start mx-auto">
+                                    <div id="reset-password-before">
+                                        <alert id="account-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Invalid SKOR account email.</c1></alert>
+                                        <alert id="error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Failed to reset password. Please try again.</c1></alert>
+                                        <label for="#reset-email"><s1><strong>Please enter your SKOR account email below:</strong></s1></label>
+                                        <div class="mt-2 mb-3">
+                                            <input class="form-control" type="email" id="reset-email" name="email" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <s2>Your new password will be sent to you via that email.</s2>
+                                        </div>
+                                    </div>
+                                    <div id="reset-password-after">
+                                        <alert id="success-msg" class="alert-positive modal-alert"><img class="alert-icon" src="images/tick.svg" alt=""><c1>Password has been successfully reset!</c1></alert>
+                                        <s2>Your new password has been sent to <span id="reset-email-display"></span>.</s2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal" >Close</button>
+                                <button type="submit" class="btn btn-primary">Reset Password</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-transparent text-white">&copy; 2021 Singapore Management University</footer>
+    
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_dark.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        const userIdentity = sessionStorage.getItem("identity");
+        if (userIdentity != null) {
+            const userDetails = JSON.parse(sessionStorage.getItem(userIdentity));
+            console.log(userDetails);
+            document.getElementById("accountName").innerHTML = userDetails.name.toUpperCase();
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("continue-login").style.display = "block";
+        }
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+            $('.modal-alert').hide();
+            resetResetPassword();
+        });
+        
+        const loginForm = document.getElementById("login-form");
+        loginForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const getTermUrl = dns + termPort + "/getCurrentTerm"
+            const loginUrl = dns + accountPort + "/loginAuthentication";
+            const homePage = {"student": "student_home.html",
+                              "ta": "ta_home.html",
+                              "faculty": "ta_home.html",
+                              "instructor": "ta_home.html",
+                              "mixed": "choose_user.html",
+                              "admin": "admin_home.html"
+                              };
+            const alert = document.getElementById("login-alert");
+            const alertText = document.getElementById("login-alert-text");
+            const password = document.getElementById("login-password");
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            try {
+                termData = await sendGetRequest(getTermUrl);
+                if (termData.code == 200) {
+                    plainFormData.acadYear = termData.data.acadYear;
+                    plainFormData.termNo = termData.data.termNo;
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    let loginData = await sendPostRequest(loginUrl, jsonFormData);
+                    if (loginData.code == 200) {
+                        alert.style.display = "none";
+                        sessionStorage.setItem("term", JSON.stringify(termData.data));
+                        let identity = loginData.data.identity;
+                        let timestamp = new Date();
+                        timestamp = timestamp.getDate() + ' ' + months[timestamp.getMonth()] + ' ' + timestamp.getFullYear() + ' ' + ('0' + timestamp.getHours()).slice(-2) + ':' + ('0' + timestamp.getMinutes()).slice(-2);
+                        sessionStorage.setItem("loginTime", timestamp);
+                        let updateLoginStatusUrl;
+                        if (identity == "mixed") {
+                            updateLoginStatusUrl = dns + userPort + "/updateStudentInfo/" + loginData.data.details.email + "?isLogin=1";
+                            sessionStorage.setItem("isTA", "yes");
+                        }
+                        else {
+                            updateLoginStatusUrl = dns + userPort + "/update" + identity.charAt(0).toUpperCase() + identity.substring(1) + "Info/" + loginData.data.details.email + "?isLogin=1";
+                        }
+                        try {
+                            const updateLoginStatusData = await sendPutRequest(updateLoginStatusUrl);
+                            loginData.data.details.isLogin = 1;
+                        } catch (error) {
+                            console.log(error);
+                        }
+                        let name = loginData.data.details.name;
+                        let rgx = new RegExp(/(\p{L}{1})\p{L}+/, 'gu');
+                        let initials = [...name.matchAll(rgx)] || [];
+                        initials = (
+                            (initials.shift()?.[1] || '') + (initials.shift()?.[1] || '')
+                        ).toUpperCase();
+                        loginData.data.details.initials = initials;
+                        sessionStorage.setItem("identity", identity);
+                        sessionStorage.setItem(identity, JSON.stringify(loginData.data.details));
+                        window.location.replace(homePage[identity]);
+                    }
+                    else if (loginData.code == 403) {
+                        defaultPointer();
+                        alertText.innerHTML = "Wrong Password. Please try again.";
+                        alert.style.display = "block";
+                        password.value = "";
+                    }
+                    else if (loginData.code == 404) {
+                        defaultPointer();
+                        alertText.innerHTML = "Invalid User. Please try again.";
+                        alert.style.display = "block";
+                        password.value = "";
+                    }
+                    else if (loginData.code == 409) {
+                        defaultPointer();
+                        alertText.innerHTML = "Already logged in.";
+                        alert.style.display = "block";
+                        password.value = "";
+                    }
+                    else {
+                        defaultPointer();
+                        alertText.innerHTML = "Code Error. Please report this error through the feedback form.";
+                        alert.style.display = "block";
+                        password.value = "";
+                    }
+                }
+            } catch (error) {
+                defaultPointer();
+                alertText.innerHTML = "Login Error. Please try again later.";
+                alert.style.display = "block";
+                password.value = "";
+            }
+        });
+    
+        const resetPasswordForm = document.getElementById("reset-password-form");
+        resetPasswordForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const email = document.getElementById("reset-email").value;
+            const resetPasswordUrl = dns + accountPort + "/resetPassword" + "/" + email;
+            try {
+                const resetPasswordData = await sendPutRequest(resetPasswordUrl);
+                if (resetPasswordData.code == 200) {
+                    defaultPointer();
+                    document.getElementById("reset-password-before").style.display = "none";
+                    document.getElementById("reset-password-after").style.display = "block";
+                    showModalAlert("success");
+                    document.getElementById("reset-email-display").innerHTML = email;
+                }
+                else if (resetPasswordData.code == 404) {
+                    defaultPointer();
+                    showModalAlert("account");
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("error");
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

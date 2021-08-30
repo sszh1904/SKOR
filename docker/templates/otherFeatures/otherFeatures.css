@@ -1,0 +1,64 @@
+ /* *************************  GENERAL  ************************* */
+ 
+/* *************************  GENERAL  ************************* */
+
+/* *************************  GENERAL  ************************* */
+
+/* *************************  TA  ************************* */
+.files input {
+    background-color: #f9f9f9;
+    outline: 2px dashed #025fff;
+    outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    padding: 180px 3% 120px 37%;
+    text-align: center !important;
+    margin: 0;
+    width: 100% !important;
+}
+.files input:focus {  
+    background-color: #f9f9f9;
+    outline: 2px dashed #025fff;  
+    outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear; border:1px solid #92b0b3;
+}
+.files{ 
+    position: relative;
+}
+.files:after {  
+    pointer-events: none;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 120px;
+    right: 0;
+    height: 120px;
+    content: "";
+    background-image: url("../images/cloud-upload.png");
+    display: block;
+    margin: 0px auto;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.files:before {
+    position: absolute;
+    bottom: 10px;
+    left: 0;  pointer-events: none;
+    width: 100%;
+    right: 0;
+    height: 57px;
+    content: " or drop your file here. ";
+    display: block;
+    margin: 0 auto;
+    color: #025fff;
+    font-weight: 600;
+    text-transform: capitalize;
+    text-align: center;
+    align-items: center;
+}
+
+#word-cloud svg {
+    min-height: 450px;
+}

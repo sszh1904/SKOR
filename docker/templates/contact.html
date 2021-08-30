@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<div>
+    <!-- Navigation Bar -->
+    <div id="nav-placeholder"></div>
+    
+    <!-- Main Content -->
+    <div class="page">
+        <section class="landing-pg landing-pg-pic bg-secondary">
+            <div class="landing-pg-title">
+                Contact Us
+            </div>
+        </section>
+
+        <section class="landing-pg">
+            <div class="landing-pg-content">
+                <form id="contact-form" class="contact-form">
+                    <div class="mb-3 row">
+                        <div class="col-sm-6">
+                            <label for="contactFirstName" class="col-form-label"><overline>Name</overline></label>
+                            <div class="">
+                                <input type="text" class="form-control" id="contactName" name="contactName" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="contactEmail" class="col-form-label"><overline>Email</overline></label>
+                            <div class="">
+                                <input type="email" class="form-control" id="contactEmail" name="contactEmail" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="col-form-label"><overline>Subject</overline></label>
+                        <div class="">
+                            <input type="text" class="form-control" id="subject" name="subject" maxlength="100" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="col-form-label"><overline>Message</overline></label>
+                        <div class="">
+                            <textarea class="form-control" id="message" name="message" placeholder="What would you like to tell us?" maxlength="300" required></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button id="contact-submit-btn" class="btn btn-primary" type="submit">Submit</button>
+                        <alert id="error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when submitting form.</c1></alert>
+                        <alert id="success-msg" class="alert-positive"><img class="alert-icon" src="images/tick.svg" alt=""><c1>Form successfully submitted!</c1></alert>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+    
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_dark.html");
+        $("#footer-placeholder").load("components/footer.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        const submitForm = document.getElementById("contact-form");
+        submitForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = document.getElementById("contact-form");
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const jsonFormData = JSON.stringify(plainFormData); 
+            const contactUrl = dns + contactSkorPort + "/contactUs";
+            try {
+                const contactData = await sendPostRequest(contactUrl, jsonFormData);
+                if (contactData.code == 200) {
+                    defaultPointer();
+                    showAlert("success");
+                    $('#contact-form').trigger("reset");
+                }
+                else {
+                    defaultPointer();
+                    showAlert("error");
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showAlert("error");
+            }
+            return false;
+        });
+
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

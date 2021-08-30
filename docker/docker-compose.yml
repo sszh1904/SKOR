@@ -1,0 +1,312 @@
+version: "3.3"
+
+services:
+    ###################################
+    # App microservice
+    ###################################
+    app:
+        build:
+            context: ./
+            dockerfile: app.Dockerfile
+        image: app:skor
+        restart: always
+        environment:
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${APP_PORT}:${APP_PORT}"
+
+
+    ###################################
+    # User microservice
+    ###################################
+    user:
+        build:
+            context: ./
+            dockerfile: user.Dockerfile
+        image: user:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${USER_PORT}:${USER_PORT}"
+
+
+    ###################################
+    # Term microservice
+    ###################################
+    term:
+        build:
+            context: ./
+            dockerfile: term.Dockerfile
+        image: term:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${TERM_PORT}:${TERM_PORT}"
+        
+
+    ###################################
+    # Course microservice
+    ###################################
+    course:
+        build:
+            context: ./
+            dockerfile: course.Dockerfile
+        image: course:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1 
+        ports:
+            - "${COURSE_PORT}:${COURSE_PORT}"
+        
+
+    ###################################
+    # Section microservice
+    ###################################
+    section:
+        build:
+            context: ./
+            dockerfile: section.Dockerfile
+        image: section:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${SECTION_PORT}:${SECTION_PORT}"
+        
+
+    ###################################
+    # Session microservice
+    ###################################
+    session:
+        build:
+            context: ./
+            dockerfile: session.Dockerfile
+        image: session:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${SESSION_PORT}:${SESSION_PORT}"
+
+
+    ###################################
+    # Log microservice
+    ###################################
+    log:
+        build:
+            context: ./
+            dockerfile: log.Dockerfile
+        image: log:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${LOG_PORT}:${LOG_PORT}"
+
+
+    ###################################
+    # SystemConfig microservice
+    ###################################
+    systemconfig:
+        build:
+            context: ./
+            dockerfile: systemconfig.Dockerfile
+        image: systemconfig:skor
+        restart: always
+        environment:
+            skorDB: ${SQLALCHEMY_DATABASE_URI}
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${SYSTEM_CONFIG_PORT}:${SYSTEM_CONFIG_PORT}"
+
+
+    ###################################
+    # SectionSocket microservice
+    ###################################
+    sectionsocket:
+        build:
+            context: ./
+            dockerfile: sectionsocket.Dockerfile
+        image: sectionsocket:skor
+        restart: always
+        environment:
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${SECTION_SOCKET_PORT}:${SECTION_SOCKET_PORT}"
+
+
+    ###################################
+    # SessionSocket microservice
+    ###################################
+    sessionsocket:
+        build:
+            context: ./
+            dockerfile: sessionsocket.Dockerfile
+        image: sessionsocket:skor
+        restart: always
+        environment:
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${SESSION_SOCKET_PORT}:${SESSION_SOCKET_PORT}"
+
+
+    ###################################
+    # Account microservice
+    ###################################
+    account:
+        build:
+            context: ./
+            dockerfile: account.Dockerfile
+        image: account:skor
+        restart: always
+        depends_on:
+            - user
+            - systemconfig
+        environment:
+            adminDetailsUrl: https://${DNS}:${USER_PORT}/getAdmin
+            updateAdminPasswordUrl: https://${DNS}:${USER_PORT}/updateAdminPassword
+            addStudentUrl: https://${DNS}:${USER_PORT}/addStudent
+            studentDetailsUrl: https://${DNS}:${USER_PORT}/getStudent
+            updateStudentPasswordUrl: https://${DNS}:${USER_PORT}/updateStudentPassword
+            taDetailsUrl: https://${DNS}:${USER_PORT}/getTA
+            addFacultyUrl: https://${DNS}:${USER_PORT}/addFaculty
+            facultyDetailsUrl: https://${DNS}:${USER_PORT}/getFaculty
+            updateFacultyPasswordUrl: https://${DNS}:${USER_PORT}/updateFacultyPassword
+            addInstructorUrl: https://${DNS}:${USER_PORT}/addInstructor
+            instructorDetailsUrl: https://${DNS}:${USER_PORT}/getInstructor
+            updateInstructorPasswordUrl: https://${DNS}:${USER_PORT}/updateInstructorPassword
+            getSelectedSkorEmailUrl: https://${DNS}:${SYSTEM_CONFIG_PORT}/getSelectedSkorEmail
+            getConfigurationUrl: https://${DNS}:${SYSTEM_CONFIG_PORT}/getConfiguration
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${ACCOUNT_PORT}:${ACCOUNT_PORT}"
+
+
+    ###################################
+    # Import microservice
+    ###################################
+    import:
+        build:
+            context: ./
+            dockerfile: import.Dockerfile
+        image: import:skor
+        restart: always
+        depends_on:
+            - user
+            - session
+            - log
+            - account
+        environment:
+            getStudentUrl: https://${DNS}:${USER_PORT}/getStudent
+            getFacultyUrl: https://${DNS}:${USER_PORT}/getFaculty
+            getInstructorUrl: https://${DNS}:${USER_PORT}/getInstructor
+            bulkAddEnrolmentUrl: https://${DNS}:${USER_PORT}/bulkAddEnrolment
+            deleteAllEnrolmentBySectionUrl: https://${DNS}:${USER_PORT}/deleteAllEnrolmentBySection
+            bulkAddStudentSessionScoreUrl: https://${DNS}:${SESSION_PORT}/bulkAddStudentSessionScore
+            getScoreBySectionByStudentUrl: https://${DNS}:${SESSION_PORT}/getScoreBySectionByStudent
+            bulkUpdateStudentSessionScoreUrl: https://${DNS}:${SESSION_PORT}/bulkUpdateStudentSessionScore
+            bulkAddStudentSessionScoreLogUrl: https://${DNS}:${LOG_PORT}/bulkAddStudentSessionScoreLog
+            createStudentAccountUrl: https://${DNS}:${ACCOUNT_PORT}/createStudentAccount
+            createFacultyAccountUrl: https://${DNS}:${ACCOUNT_PORT}/createFacultyAccount
+            createInstructorAccountUrl: https://${DNS}:${ACCOUNT_PORT}/createInstructorAccount
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${IMPORT_PORT}:${IMPORT_PORT}"
+
+
+    ###################################
+    # DisplayInfo microservice
+    ###################################
+    displayinfo:
+        build:
+            context: ./
+            dockerfile: displayinfo.Dockerfile
+        image: displayinfo:skor
+        restart: always
+        depends_on:
+            - user
+            - course
+            - section
+        environment:
+            getSectionUrl: https://${DNS}:${SECTION_PORT}/getSection
+            getSectionsByCourseUrl: https://${DNS}:${SECTION_PORT}/getSectionsByCourse
+            getSectionsByTermByTAUrl: https://${DNS}:${SECTION_PORT}/getSectionsByTermByTA
+            getSectionsByTermByFacultyUrl: https://${DNS}:${SECTION_PORT}/getSectionsByTermByFaculty
+            getSectionsByTermByInstructorUrl: https://${DNS}:${SECTION_PORT}/getSectionsByTermByInstructor
+            getPriorityCallBySectionUrl: https://${DNS}:${SECTION_PORT}/getPriorityCallBySection
+            getStudentUrl: https://${DNS}:${USER_PORT}/getStudent
+            getFacultyUrl: https://${DNS}:${USER_PORT}/getFaculty
+            getInstructorUrl: https://${DNS}:${USER_PORT}/getInstructor
+            getCourseUrl: https://${DNS}:${COURSE_PORT}/getCourse
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${DISPLAY_INFO_PORT}:${DISPLAY_INFO_PORT}"
+
+
+    ################################### 
+    # UpdateCP microservice
+    ###################################
+    updatecp:
+        build:
+            context: ./
+            dockerfile: updatecp.Dockerfile
+        image: updatecp:skor
+        restart: always
+        depends_on:
+            - section
+            - session
+            - log
+        environment:
+            getSectionUrl: https://${DNS}:${SECTION_PORT}/getSection
+            getScoreBySessionByStudentUrl: https://${DNS}:${SESSION_PORT}/getScoreBySessionByStudent
+            awardParticipationUrl: https://${DNS}:${SESSION_PORT}/awardParticipation
+            invalidateParticipationUrl: https://${DNS}:${SESSION_PORT}/invalidateParticipation
+            awardBonusParticipationUrl: https://${DNS}:${SESSION_PORT}/awardBonusParticipation
+            plusStudentSessionScoreUrl: https://${DNS}:${SESSION_PORT}/plusStudentSessionScore
+            minusStudentSessionScoreUrl: https://${DNS}:${SESSION_PORT}/minusStudentSessionScore
+            updateStudentSessionScoreUrl: https://${DNS}:${SESSION_PORT}/updateStudentSessionScore
+            addParticipationLogUrl: https://${DNS}:${LOG_PORT}/addParticipationLog
+            addStudentSessionScoreLogUrl: https://${DNS}:${LOG_PORT}/addStudentSessionScoreLog
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${UPDATE_CP_PORT}:${UPDATE_CP_PORT}"
+
+
+    ###################################
+    # ContactSkor microservice
+    ###################################
+    contactskor:
+        build:
+            context: ./
+            dockerfile: contactskor.Dockerfile
+        image: contactskor:skor
+        restart: always
+        depends_on: 
+            - systemconfig
+        environment:
+            getSelectedSkorEmailUrl: https://${DNS}:${SYSTEM_CONFIG_PORT}/getSelectedSkorEmail
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${CONTACT_SKOR_PORT}:${CONTACT_SKOR_PORT}"
+            
+    ###################################
+    # App_test microservice
+    ###################################
+    app_test:
+        build:
+            context: ./
+            dockerfile: app_test.Dockerfile
+        image: app_test:skor
+        restart: always
+        environment:
+            PYTHONUNBUFFERED: 1
+        ports:
+            - "${TEST_PORT}:${TEST_PORT}"

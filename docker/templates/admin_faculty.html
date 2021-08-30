@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayAllFac()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <div class="container page-container">
+
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+
+        <div class="text-end">
+            <!-- Create Faculty Modal Button -->
+            <button class="btn btn-primary d-inline-block" data-bs-toggle="modal" data-bs-target="#create-faculty">Add</button>
+            <!-- Admin Import -->
+            <div id="admin-import-placeholder" class="d-inline-block"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="fac-container" class="module-container row"></div>
+    </div>
+    
+    <!-- Add Faculty Modal  -->
+    <div class="modal fade" id="create-faculty" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="create-faculty-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="create-faculty-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-faculty-label">Add New Faculty</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="exist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Faculty already exists.</c1></alert>
+                            <alert id="error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating faculty.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-3">
+                                    <label for="#facultyName"><overline class="modal-form-label">Name</overline></label>
+                                </div>
+
+                                <div class="col-9">
+                                    <input type="text" id="facultyName" class="form-control" name="name" required>
+                                </div>
+
+                                <div class="col-3">
+                                    <label for="#facultyEmail"><overline class="modal-form-label">Email</overline></label>
+                                </div>
+
+                                <div class="col-9">
+                                    <input type="email" id="facultyEmail" class="form-control" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Faculty</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Faculty Modal  -->
+    <div class="modal fade" id="update-faculty" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="update-faculty-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="update-faculty-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="update-faculty-label">Update Faculty</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="update-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when updating faculty.</c1></alert>
+                            <div class="row g-3">
+                                <input type="hidden" id="updateFacultyEmail" name="email">
+                                <div class="col-3">
+                                    <label for="#updateFacultyName"><overline class="modal-form-label">Name</overline></label>
+                                </div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" id="updateFacultyName" name="name" required>
+                                </div>
+                                <div class="col-3">
+                                    <label for="#displayFacultyEmail"><overline class="modal-form-label">Email</overline></label>
+                                </div>
+                                <div class="col-9">
+                                    <input type="email" class="form-control" id="displayFacultyEmail" disabled required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update Faculty</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-faculty" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-faculty-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-faculty-label">Confirm Delete Faculty</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="container mx-auto text-start">
+                                <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                                <s2>This action cannot be undone.</s2>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+    
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/admin_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+        $("#admin-import-placeholder").load("components/admin_import.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.modal-alert').hide();
+        });
+        
+        const createFacForm = document.getElementById("create-faculty-form");
+        createFacForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const getFacUrl = dns + userPort + "/getFaculty" + "/" + plainFormData.email;
+            try {
+                const getFacData = await sendGetRequest(getFacUrl);
+                if (getFacData.code == 200) {
+                    defaultPointer();
+                    showModalAlert("exist");
+                }
+                else if ((getFacData.code == 404)){
+                    const addFacUrl = dns + accountPort + "/createFacultyAccount";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addFacData = await sendPostRequest(addFacUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        defaultPointer();
+                        console.log(error);
+                        showModalAlert("error");
+                    }
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("error");
+            }
+        });
+        
+        const updateFacForm = document.getElementById("update-faculty-form");
+        updateFacForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const updateFacUrl = dns + userPort + "/updateFacultyInfo" + "/" + plainFormData.email + "?name=" + plainFormData.name;
+            try {
+                const updateFacData = await sendPutRequest(updateFacUrl);
+                location.reload();
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("update");
+            }
+        });
+    </script>   
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

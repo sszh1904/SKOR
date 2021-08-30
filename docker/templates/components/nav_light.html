@@ -1,0 +1,75 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <div class="container-fluid row g-1 mx-3">
+        <div class="col">
+            <a class="navbar-brand" href="index.html"><img id="skor-logo" src="images/SKOR_logo.svg" alt="SKOR Logo" ></a>
+        </div>
+        <span id="nav-term" class="badge rounded-pill bg-primary nav-badge col"></span>
+        <div class="col">
+            <a class="nav-link p-0 float-end" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div id="nav-initials" nav-initials=""><img id="nav-initials-arrow" src="images/initials_arrow.svg"></div>
+            </a>
+            <ul id="nav-dropdown" class="dropdown-menu dropdown-menu-end me-2" aria-labelledby="navbarDropdown">
+                <li id="nav-profile"></li>
+                <li><hr class="dropdown-divider"></li>
+                <li id="switch-account-btn" class="switch-account"><a class="dropdown-item" onclick="switchAccount()">Switch User</a></li>
+                <li id="switch-account-divider" class="switch-account"><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" onclick="logout()">Logout</a></li>
+            </ul>
+            <div class="nav-item float-end me-4">
+                <a id="nav-home" class="nav-link navbar-light-link" aria-current="page" href="">HOME</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Display current term in navbar badge
+    const navTerm = JSON.parse(sessionStorage.getItem('term'));
+    document.getElementById("nav-term").innerHTML = navTerm.acadYear + " Term " + navTerm.termNo; 
+    
+    // Add "PROFILE" dropdown link and "HOME" href link 
+    let navIdentity = sessionStorage.getItem("identity");
+    if (navIdentity != "student" && navIdentity != "admin") {
+        navIdentity = "ta";
+    }
+    document.getElementById("nav-profile").innerHTML = `<a class="dropdown-item" href="${navIdentity}_profile.html">Profile</a>`;
+    document.getElementById("nav-home").href = `${navIdentity}_home.html`;
+    
+    // Fill nav initials circle with user's initials
+    let navInitials;
+    let navUser = sessionStorage.getItem("identity");
+    navInitials = JSON.parse(sessionStorage.getItem(navUser)).initials;
+    document.getElementById("nav-initials").setAttribute("nav-initials", navInitials);
+    
+    // Display "SWITCH ACCOUNT" dropdown link if user is student + TA
+    if (sessionStorage.getItem("isTA") == "yes") {
+        document.getElementById("switch-account-btn").style.display = "block";
+        document.getElementById("switch-account-divider").style.display = "block";
+    }
+    
+    function switchAccount() {
+        let identity = sessionStorage.getItem("identity");
+        if (identity == "student") {
+            let studentDetails = sessionStorage.getItem("student");
+            sessionStorage.setItem("identity", "ta");
+            sessionStorage.setItem("ta", studentDetails);
+            window.location.replace("ta_home.html");
+        }
+        else {
+            let taDetails = sessionStorage.getItem("ta");
+            sessionStorage.setItem("identity", "student");
+            sessionStorage.setItem("student", taDetails);
+            window.location.replace("student_home.html");
+        }
+    }
+    
+    // Add "active" class to current page navlink (either HOME or none)
+    const navPath = window.location.pathname;
+    const navPage = navPath.split("/").pop();
+    selectNavLight(navPage.split("_")[1]);
+    
+    function selectNavLight(nav) {
+        if (nav == "home.html")
+        document.getElementById("nav-home").classList.add("active");
+    }
+</script>

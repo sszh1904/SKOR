@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayAllSections()">
+    
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+
+    <div class="container page-container">
+
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+
+        <div class="d-flex justify-content-between">
+            <!-- Back button -->
+            <div class="back-btn-container">
+                <a href="admin_term.html"><img id="back-arrow" src="images/back_arrow.svg">GO BACK</a>
+            </div>
+            
+            <div>
+                <!-- Add Modal Buttons -->
+                <button class="btn btn-primary me-2 d-inline-block" data-bs-toggle="modal" data-bs-target="#create-faculty"><img class="add-icon" src="images/plus.svg"> Faculty</button>
+                <button class="btn btn-primary me-2 d-inline-block" data-bs-toggle="modal" data-bs-target="#create-instructor"><img class="add-icon" src="images/plus.svg"> Instructor</button>
+                <button class="btn btn-primary me-0 d-inline-block" data-bs-toggle="modal" data-bs-target="#add-ta"><img class="add-icon" src="images/plus.svg"> TA</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="course-header"></div>
+
+        <div id="section-container" class="module-container row"></div>
+    </div>
+    
+    <!-- Add New TA Modal -->
+    <div class="modal fade" id="add-ta" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="add-ta-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="add-ta-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="add-ta-label">Add New TA</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="taExist-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>TA already exists.</c1></alert>
+                            <alert id="taError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when adding TA.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#ta"><overline class="modal-form-label">Select Name</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <select id="ta" class="form-control" name="email"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add TA</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add New Faculty Modal  -->
+    <div class="modal fade" id="create-faculty" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="create-faculty-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="create-faculty-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-faculty-label">Add New Faculty</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="facultyExist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Faculty already exists.</c1></alert>
+                            <alert id="facultyError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating faculty.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-3">
+                                    <label for="#facultyName"><overline class="modal-form-label">Name</overline></label>
+                                </div>
+
+                                <div class="col-9">
+                                    <input type="text" id="facultyName" class="form-control" name="name" required>
+                                </div>
+
+                                <div class="col-3">
+                                    <label for="#facultyEmail"><overline class="modal-form-label">Email</overline></label>
+                                </div>
+
+                                <div class="col-9">
+                                    <input type="email" id="facultyEmail" class="form-control" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Faculty</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Instructor Modal  -->
+    <div class="modal fade" id="create-instructor" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="create-instructor-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="create-instructor-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-instructor-label">Add New Instructor</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="instructorExist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Instructor already exists.</c1></alert>
+                            <alert id="instructorError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating instructor.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-3">
+                                    <label for="#instructorName"><overline class="modal-form-label">Name</overline></label>
+                                </div>
+
+                                <div class="col-9">
+                                    <input type="text" id="instructorName" class="form-control" name="name" required>
+                                </div>
+
+                                <div class="col-3">
+                                    <label for="#instructorEmail"><overline class="modal-form-label">Email</overline></label>
+                                </div>
+
+                                <div class="col-9">
+                                    <input type="email" id="instructorEmail" class="form-control" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Instructor</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+            
+    <!-- Add New Section Modal -->
+    <div class="modal fade" id="create-section" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="create-section-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center modal-lg">
+                <form id="create-section-form">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-section-label">Add New Section</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="exist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Section already exists.</c1></alert>
+                            <alert id="error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating section.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#sectionNo"><overline class="modal-form-label">Section Name</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select id="sectionNo" class="form-control" name="sectionNo" required>
+                                        <option value="1">G1</option>
+                                        <option value="2">G2</option>
+                                        <option value="3">G3</option>
+                                        <option value="4">G4</option>
+                                        <option value="5">G5</option>
+                                        <option value="6">G6</option>
+                                        <option value="7">G7</option>
+                                        <option value="8">G8</option>
+                                        <option value="9">G9</option>
+                                        <option value="10">G10</option>
+                                        <option value="11">G11</option>
+                                        <option value="12">G12</option>
+                                        <option value="13">G13</option>
+                                        <option value="14">G14</option>
+                                        <option value="15">G15</option>
+                                        <option value="16">G16</option>
+                                        <option value="17">G17</option>
+                                        <option value="18">G18</option>
+                                        <option value="19">G19</option>
+                                        <option value="20">G20</option>
+                                        <option value="21">G21</option>
+                                        <option value="22">G22</option>
+                                        <option value="23">G23</option>
+                                        <option value="24">G24</option>
+                                        <option value="25">G25</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#facSelect"><overline class="modal-form-label">Select Faculty</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="facultyEmail" class="form-control" id="facSelect" required></select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#instrSelect"><overline class="modal-form-label">Select Instructor</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="instructorEmail" class="form-control" id="instrSelect" required></select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#taSelect"><overline class="modal-form-label">Select TA</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="taEmail" class="form-control" id="taSelect"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#day"><overline class="modal-form-label">Select Day</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="day" class="form-control" id="day" required>
+                                        <option value="Mon">Monday</option>
+                                        <option value="Tue">Tuesday</option>
+                                        <option value="Wed">Wednesday</option>
+                                        <option value="Thu">Thursday</option>
+                                        <option value="Fri">Friday</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#startTime"><overline class="modal-form-label">Start Time</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="startTime" class="form-control" id="startTime" onchange="setMinEndTime('endTime',this.value)" required>
+                                        <option value="0815">0815</option>
+                                        <option value="1200">1200</option>
+                                        <option value="1530">1530</option>
+                                        <option value="1900">1900</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#endTime"><overline class="modal-form-label">End Time</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="endTime" class="form-control" id="endTime" onchange="setMaxStartTime('startTime',this.value)" required>
+                                        <option value="1130">1130</option>
+                                        <option value="1515">1515</option>
+                                        <option value="1845">1845</option>
+                                        <option value="2215">2215</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#startDate"><overline class="modal-form-label">Start Date</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="date" class="form-control" name="startDate" id="startDate" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Section</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update Section Modal -->
+    <div class="modal fade" id="update-section" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="update-section-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center modal-lg">
+                <form id="update-section-form">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-section-label">Update Section</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="update-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when updating section.</c1></alert>
+                            <div class="row g-3">
+                                <input type="hidden" id="acadYear" name="acadYear">
+                                <input type="hidden" id="termNo" name="termNo">
+                                <input type="hidden" id="courseCode" name="courseCode">
+                                <input type="hidden" id="updateSectionNo" name="sectionNo">
+                                
+                                <div class="col-4">
+                                    <label for="#displaySectionNo"><overline class="modal-form-label">Section Name</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="displaySectionNo" disabled required>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateFacSelect"><overline class="modal-form-label">Select Faculty</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="facultyEmail" class="form-control" id="updateFacSelect" required></select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateInstrSelect"><overline class="modal-form-label">Select Instructor</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="instructorEmail" class="form-control" id="updateInstrSelect" required></select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateTASelect"><overline class="modal-form-label">Select TA</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="taEmail" class="form-control" id="updateTASelect"></select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateDay"><overline class="modal-form-label">Select Day</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="day" class="form-control" id="updateDay" required>
+                                        <option id="Mon" value="Mon">Monday</option>
+                                        <option id="Tue" value="Tue">Tuesday</option>
+                                        <option id="Wed" value="Wed">Wednesday</option>
+                                        <option id="Thu" value="Thu">Thursday</option>
+                                        <option id="Fri" value="Fri">Friday</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateStartTime"><overline class="modal-form-label">Start Time</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="startTime" class="form-control" id="updateStartTime" onchange="setMinEndTime('updateEndTime',this.value)" required>
+                                        <option id="start-0815" value="0815">0815</option>
+                                        <option id="start-1200" value="1200">1200</option>
+                                        <option id="start-1530" value="1530">1530</option>
+                                        <option id="start-1900" value="1900">1900</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateEndTime"><overline class="modal-form-label">End Time</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <select name="endTime" class="form-control" id="updateEndTime" onchange="setMaxStartTime('updateStartTime',this.value)" required>
+                                        <option id="end-1130" value="1130">1130</option>
+                                        <option id="end-1515" value="1515">1515</option>
+                                        <option id="end-1845" value="1845">1845</option>
+                                        <option id="end-2215" value="2215">2215</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label for="#updateStartDate"><overline class="modal-form-label">Start Date</overline></label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="date" class="form-control" name="startDate" id="updateStartDate" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update Section</button>
+                        </div> 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-section" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-section-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-section-label">Confirm Delete Section</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="container mx-auto text-start">
+                                <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                                <s2>This action cannot be undone.</s2>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>      
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/admin_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.modal-alert').hide();
+        });
+        
+        const createSectionForm = document.getElementById("create-section-form");
+        createSectionForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            plainFormData["acadYear"] = JSON.parse(sessionStorage.getItem('term')).acadYear;
+            plainFormData["termNo"] = JSON.parse(sessionStorage.getItem('term')).termNo;
+            plainFormData["courseCode"] = JSON.parse(sessionStorage.getItem('course')).courseCode;
+            plainFormData["courseName"] = JSON.parse(sessionStorage.getItem('course')).courseName;
+            if (!("instructorEmail" in plainFormData)) {
+                plainFormData.instructorEmail = null;
+            }
+            if (!("taEmail" in plainFormData)) {
+                plainFormData.taEmail = null;
+            }
+            console.log(plainFormData);
+            const getSectionUrl = dns + sectionPort + "/getSection" + "/" + plainFormData.acadYear + "/" + plainFormData.termNo + "/" + plainFormData.courseCode + "/" + plainFormData.sectionNo;
+            try {
+                const getSectionData = await sendGetRequest(getSectionUrl);
+                if (getSectionData.code == 200) {
+                    defaultPointer();
+                    showModalAlert("exist");
+                }
+                else if ((getSectionData.code == 404)){
+                    const addSectionUrl = dns + sectionPort + "/addSection";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addSectionData = await sendPostRequest(addSectionUrl, jsonFormData);
+                        if (addSectionData.code == 200) {
+                            const addSessionsUrl = dns + sessionPort + "/createAllSessions";
+                            try{
+                                const addSessionsData = await sendPostRequest(addSessionsUrl, jsonFormData);
+                                location.reload();
+                            } catch (error) {
+                                defaultPointer();
+                                console.log(error);
+                                showModalAlert("error");
+                            }
+                        }
+                    } catch (error) {
+                        defaultPointer();
+                        console.log(error);
+                        showModalAlert("error");
+                    }
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("error");
+            }
+        });
+        
+        const updateSectionForm = document.getElementById("update-section-form");
+        updateSectionForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            let instructor = "";
+            let ta = "";
+            if (plainFormData.instructorEmail) {
+                instructor = "&instructorEmail=" + plainFormData.instructorEmail;
+            }
+            if (plainFormData.taEmail) {
+                ta = "&taEmail=" + plainFormData.taEmail;
+            }
+            const updateSectionUrl = dns + sectionPort + "/updateSectionConfig" + "/" + plainFormData.acadYear + "/" + plainFormData.termNo + "/" + plainFormData.courseCode + "/" + plainFormData.sectionNo + "?facultyEmail=" + plainFormData.facultyEmail + instructor + ta + "&day=" + plainFormData.day + "&startTime=" + plainFormData.startTime + "&endTime=" + plainFormData.endTime;
+            try {
+                const updateSectionData = await sendPutRequest(updateSectionUrl);
+                location.reload();
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("update");
+            }
+        });
+        
+        const addTAForm = document.getElementById("add-ta-form");
+        addTAForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const term = JSON.parse(sessionStorage.getItem("term"));
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            plainFormData.acadYear = term.acadYear;
+            plainFormData.termNo = term.termNo;
+            const getTAUrl = dns + userPort + "/getTA" + "/" + plainFormData.email + "/" + plainFormData.acadYear + "/" + plainFormData.termNo;
+            try {
+                const getTAData = await sendGetRequest(getTAUrl);
+                if (getTAData.code == 200) {
+                    showModalAlert("taExist");
+                }
+                else if ((getTAData.code == 404)){
+                    const addTAUrl = dns + userPort + "/addTA";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addTAData = await sendPostRequest(addTAUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                        showModalAlert("taError");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("taError");
+            }
+        });
+        
+        const createFacForm = document.getElementById("create-faculty-form");
+        createFacForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const getFacUrl = dns + userPort + "/getFaculty" + "/" + plainFormData.email;
+            try {
+                const getFacData = await sendGetRequest(getFacUrl);
+                if (getFacData.code == 200) {
+                    defaultPointer();
+                    showModalAlert("facultyExist");
+                }
+                else if ((getFacData.code == 404)){
+                    const addFacUrl = dns + accountPort + "/createFacultyAccount";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addFacData = await sendPostRequest(addFacUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        defaultPointer();
+                        console.log(error);
+                        showModalAlert("facultyError");
+                    }
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("facultyError");
+            }
+        });
+        
+        const createInstrForm = document.getElementById("create-instructor-form");
+        createInstrForm.addEventListener("submit", async function(event) {
+            loadingPointer();
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const getInstrUrl = dns + userPort + "/getInstructor" + "/" + plainFormData.email;
+            try {
+                const getInstrData = await sendGetRequest(getInstrUrl);
+                if (getInstrData.code == 200) {
+                    defaultPointer();
+                    showModalAlert("instructorExist");
+                }
+                else if ((getInstrData.code == 404)){
+                    const addInstrUrl = dns + accountPort + "/createInstructorAccount";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addInstrData = await sendPostRequest(addInstrUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        defaultPointer();
+                        console.log(error);
+                        showModalAlert("instructorError");
+                    }
+                }
+            } catch (error) {
+                defaultPointer();
+                console.log(error);
+                showModalAlert("instructorError");
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

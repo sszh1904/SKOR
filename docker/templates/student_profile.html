@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayStudentProfile()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <!-- Main Content -->
+    <div class="container profile-container">
+        <div class="card card-container">
+            <div class="card-header">
+                Personal Details
+            </div>
+            <div class="card-body row">
+                <div class="col-3 thumbnail-container">
+                    <div id="initials" data-initials=""></div>
+                    <div class="badge identity-badge student-badge">
+                        <overline>Student</overline>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="row g-4 my-auto">
+                        <div class="col-2">
+                            <overline>Name</overline>
+                        </div>
+                        <div id="name" class="col-10"></div>
+                        <div class="col-2">
+                            <overline>Email</overline>
+                        </div>
+                        <div id="email" class="col-10"></div>
+                        <div class="col-2">
+                            <overline>Last Login</overline>
+                        </div>
+                        <div id="lastLogin" class="col-10"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-container">
+            <div class="card-header">
+                Account Details
+            </div>
+            <form id="password-form" class="card-body my-auto">
+                <div class="row profile-row">
+                    <div class="col-3">
+                        <overline>Old Password</overline>
+                    </div>
+                    <div id="oldPassword" class="col-9"></div>
+                </div>
+                <div class="row profile-row">
+                    <div class="col-3">
+                        <overline>New Password</overline>
+                    </div>
+                    <div class="col-9">
+                        <input id="newPassword" class="form-control profile-textbox" type="password" name="newPassword" required>
+                        <alert id="pw-error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Password must be at least 8 characters.</c1></alert>
+                    </div>
+                </div>
+                <div class="row profile-row">
+                    <div class="col-3">
+                        <overline>Confirm New Password</overline>
+                    </div>
+                    <div class="col-9">
+                        <input id="confirmPassword" class="form-control profile-textbox" type="password" name="confirmPassword" required>
+                        <alert id="match-error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Passwords do not match.</c1></alert>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <alert id="error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when saving new password.</c1></alert>
+                    <alert id="success-msg" class="alert-positive"><img class="alert-icon" src="images/tick.svg" alt=""><c1>Password successfully changed!</c1></alert>
+                </div>
+            </form>          
+        </div>
+    </div>
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        const passwordForm = document.getElementById("password-form");
+        passwordForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const newPassword = plainFormData.newPassword;
+            const student = JSON.parse(sessionStorage.getItem("student"));
+            // if (newPassword == student.password) {
+            //     document.getElementById("pw-error-msg").innerHTML = "Same as current password.";
+            //     document.getElementById("match-error-msg").innerHTML = "";
+            //     document.getElementById("success-msg").innerHTML = "";
+            //     document.getElementById("error-msg").innerHTML = "";
+            // }
+            if (newPassword.length < 8) {
+                showAlert("pw");
+            }
+            else if (newPassword != plainFormData.confirmPassword) {
+                showAlert("match");
+
+            }
+            else {
+                const student = JSON.parse(sessionStorage.getItem("student"));
+                const changeStudentPasswordUrl = dns + userPort + "/updateStudentPassword" + "/" + student.email + "/" + newPassword;
+                try {
+                    const studentData = await sendPutRequest(changeStudentPasswordUrl);
+                    if (studentData.code == 200) {
+                        studentData.data.initials = student.initials;
+                        sessionStorage.setItem("student", JSON.stringify(studentData.data));
+                        displayStudentProfile();
+                        showAlert("success");
+                        $('#password-form').trigger("reset");
+                    }
+                } catch (error) {
+                    console.log(error);
+                    showAlert("error");
+                }
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayCoursesByTerm()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <div class="container page-container">
+        
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+        
+        <div class="d-flex justify-content-between">
+            <!-- Back button -->
+            <div class="back-btn-container">
+                <a href="admin_home.html"><img id="back-arrow" src="images/back_arrow.svg">GO BACK</a>
+            </div>
+            
+            <!-- Add New Course Modal Button -->
+            <button class="btn btn-primary d-inline-block" data-bs-toggle="modal" data-bs-target="#create-course"><img class="add-icon" src="images/plus.svg"> Course</button>        
+        </div>
+        
+        <!-- Main Content -->
+        <div id="term-header"></div>
+        
+        <div id="course-container" class="module-container row"></div>
+    </div>
+    
+    <!-- Add New Course Modal  -->
+    <div class="modal fade" id="create-course" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="create-course-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="create-course-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="create-course-label">Add New Course</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="courseExist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Course already exists.</c1></alert>
+                            <alert id="courseError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating course.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#courseCode"><overline class="modal-form-label">Course Code</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <input type="text" id="courseCode" class="form-control" name="courseCode" required>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="#courseName"><overline class="modal-form-label">Course Name</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <input type="text" id="courseName" class="form-control" name="courseName" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Course</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Course Offering Modal -->
+    <div class="modal fade" id="add-course-offering" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="add-course-offering-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <form id="add-course-offering-form" action="#">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="add-course-offering-label">Add Course Offering</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <alert id="exist-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Course offering already exists.</c1></alert>
+                            <alert id="error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when adding course offering.</c1></alert>
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label for="#courseOffering"><overline class="modal-form-label">Select Course</overline></label>
+                                </div>
+
+                                <div class="col-8">
+                                    <select id="courseOffering" class="form-control" name="courseCode"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add Course Offering</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade mx-auto" id="delete-course-offering" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="delete-course-offering-label" aria-hidden="true">
+        <div class="vertical-alignment-helper">
+            <div class="modal-dialog vertical-align-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="delete-course-offering-label">Confirm Delete Course Offering</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="container mx-auto text-start">
+                                <s1><strong>Are you sure you want to delete?</strong></s1><br>
+                                <s2>This action cannot be undone.</s2>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/admin_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Starts idle timer countdown for logout
+        $(document).ready(function(){
+            setupTimers();
+        });
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.modal-alert').hide();
+        });
+        
+        const addCourseOfferingForm = document.getElementById("add-course-offering-form");
+        addCourseOfferingForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            plainFormData.acadYear = JSON.parse(sessionStorage.getItem('term')).acadYear;
+            plainFormData.termNo = JSON.parse(sessionStorage.getItem('term')).termNo;
+            const jsonFormData = JSON.stringify(plainFormData);
+            const getCourseOfferingUrl = dns + coursePort + "/getCourseOffering" + "/" + plainFormData.acadYear + "/" + plainFormData.termNo + "/" + plainFormData.courseCode;
+            try {
+                const getCourseOfferingData = await sendGetRequest(getCourseOfferingUrl);
+                if (getCourseOfferingData.code == 200) {
+                    showModalAlert("exist");
+                }
+                else if ((getCourseOfferingData.code == 404)){
+                    const addCourseOfferingUrl = dns + coursePort + "/addCourseOffering";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addCourseOfferingData = await sendPostRequest(addCourseOfferingUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                        showModalAlert("error");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("error");
+            }
+        });
+        
+        const createCourseForm = document.getElementById("create-course-form");
+        createCourseForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const getCourseUrl = dns + coursePort + "/getCourse" + "/" + plainFormData.courseCode;
+            try {
+                const getCourseData = await sendGetRequest(getCourseUrl);
+                if (getCourseData.code == 200) {
+                    showModalAlert("courseExist");
+                }
+                else if ((getCourseData.code == 404)){
+                    const addCourseUrl = dns + coursePort + "/addCourse";
+                    const jsonFormData = JSON.stringify(plainFormData);
+                    try {
+                        const addCourseData = await sendPostRequest(addCourseUrl, jsonFormData);
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                        showModalAlert("courseError");
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                showModalAlert("courseError");
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

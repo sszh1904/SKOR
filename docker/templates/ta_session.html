@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKOR</title>
+    
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/5fdc4c8a3e.js" crossorigin="anonymous"></script>
+    
+    <!-- Webpage icon -->
+    <link rel="icon" href="images/SKOR_logo_icon.svg"> 
+    
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!-- WordCloud -->
+    <!-- <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-tag-cloud.min.js"></script> -->
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body onload="displayTASessionPage()">
+
+    <!--Navigation Bar-->
+    <div id="nav-placeholder"></div>
+    
+    <div class="container page-container">
+    
+        <!-- Sub-Navigation Bar -->
+        <div id="sub-navbar-placeholder"></div>
+        
+        <!-- Back button -->
+        <div class="back-btn-container">
+            <a href="ta_class.html"><img id="back-arrow" src="images/back_arrow.svg">GO BACK</a>
+        </div>
+        
+        <!-- End Session Modal Button -->
+        <button id="end-btn" class="btn btn-danger float-end" data-bs-toggle="modal" data-bs-target="#end-session"><strong>End </strong><i class="fa fa-clock"></i></button>
+        
+        <!-- Main Content -->
+        <section class="container p-0">
+            
+            <div id="session-header"></div>
+
+            <div class="card card-container">
+                <div class="card-header">Raise-Hand List</div>
+                <div class="card-body raisehand-list-container">
+                    <div class="raisehand-list">
+                        <table class="table mb-0 text-center">
+                            <tr>
+                                <th class="col text-start">Name</th><th class="col-2">Priority</th><th class="col-1">Score</th><th class="col-1">Total</th><th class="col-2">Action</th>
+                            </tr>
+                            <table id="answered-list" class="table mb-0"></table>
+                            <table id="raisehand-list" class="table mb-0"></table>
+                        </table>
+                    </div>
+                    
+                    <button id="clearHands" class="btn btn-outline-danger">Clear</button>
+                </div>
+            </div>
+
+            <div>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Class List</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="configurations-tab" data-bs-toggle="tab" data-bs-target="#configurations" type="button" role="tab" aria-controls="profile" aria-selected="false">Configurations</button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-content card-container mt-0 ta-dashboard">
+                <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div id="classlist-container" class="classlist"></div>
+                </div>
+
+                <div class="tab-pane" id="configurations" role="tabpanel" aria-labelledby="configurations-tab">
+                    <form id="update-config-form" class="row g-3 mx-0">
+                        <div class="col-3 p-0">
+                            <label for="#score-limit" class="form-label"><overline class="modal-form-label">Participation Limit</overline></label>
+                        </div>
+                        <div class="col-9">
+                            <input id="score-limit" class="w-25 form-control config-textbox" type="number" min="1" name="limit" required>
+                            <alert id="limit-error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>Same as current limit.</c1></alert>
+                        </div>
+                        <div class="col-12 p-0">
+                            <button class="btn btn-primary" type="submit">Save Changes</button>
+                            <alert id="error-msg" class="alert-negative error-msg"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when saving configurations.</c1></alert>
+                            <alert id="success-msg" class="alert-positive"><img class="alert-icon" src="images/tick.svg" alt=""><c1>Configurations successfully saved!</c1></alert>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- End Confirmation Modal -->
+    <div class="modal fade mx-auto" id="end-session" data-bs-backdrop="static" data-bs-keyboard="false"  aria-labelledby="end-session-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="end-session-label">Confirm End Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container mx-auto text-start">
+                        <s1><strong>Are you sure you want to end current session?</strong></s1>
+                        <s2>This action cannot be undone.</s2>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" onclick="endSession()">End</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Issue -->
+    <div id="report-issue-placeholder"></div>
+
+    <script>
+        // Fill placeholders with components
+        $("#nav-placeholder").load("components/nav_light.html");
+        $("#sub-navbar-placeholder").load("components/ta_sub_navbar.html");
+        $("#report-issue-placeholder").load("components/report_issue.html");
+    </script>
+    
+    <script src="js/script.js"></script>
+    <script src="js/request.js"></script>
+    <script src="js/taSession.js"></script>
+    
+    <script>
+        defaultPointer();
+        
+        // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+            $(this)
+                .find("input,textarea")
+                .val('')
+                .end()
+                // .find("input[type=checkbox], input[type=radio]")
+                // .prop("checked", "")
+                // .end();
+            $('.error-msg').empty();
+        });
+        
+        const updateConfigForm = document.getElementById("update-config-form");
+        updateConfigForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const plainFormData = Object.fromEntries(formData.entries());
+            const limit = plainFormData.limit;
+            let section = JSON.parse(sessionStorage.getItem("section"));
+            if (limit == section.participationScoreLimit) {
+                showSavingChangesAlert("limit");
+            }
+            else {
+                const url = dns + sectionPort + "/updateSectionConfig/" + section.acadYear + "/" + section.termNo + "/" + section.courseCode + "/" + section.sectionNo + "?participationScoreLimit=" + limit;
+                try {
+                    const responseData = await sendPutRequest(url);
+                    if (responseData.code == 200) {
+                        refreshSocket();
+                        section.participationScoreLimit = limit;
+                        sessionStorage.setItem("section", JSON.stringify(section));
+                        showSavingChangesAlert("success");
+                    }
+                } catch (error) {
+                    console.log(error);
+                    showSavingChangesAlert("error");
+                }
+            }
+        });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

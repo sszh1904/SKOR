@@ -1,0 +1,94 @@
+<!-- Import Modal Button -->
+<button class="btn btn-primary ms-2 me-0" data-bs-toggle="modal" data-bs-target="#admin-import">Import</button>  
+
+<!-- Import Modal -->
+<div class="modal fade" id="admin-import" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="admin-import-label" aria-hidden="true">
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center">
+            <form id="admin-import-form" action="#">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="admin-import-label">Import</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <alert id="import-error-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when creating course.</c1></alert>
+                        <input type="file" id="import-file" class="form-control" required>
+                        <div id="upload-info" class="mt-4 mb-2 text-start"><s2>Please be patient, this may take up to a few minutes...</s2></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Import</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Resets modal inputs and alerts when modal closes
+    $('.modal').on('hidden.bs.modal', function (e) {
+        $(this)
+            .find("input,textarea")
+            .val('')
+            .end()
+        $('.modal-alert').hide();
+    });
+    
+    const importForm = document.getElementById('admin-import-form')
+    importForm.addEventListener("submit", function(event) {
+        loadingPointer();
+        event.preventDefault();
+        document.getElementById("upload-info").style.display = "block";
+        const path = window.location.pathname;
+        const page = path.split("/").pop();
+        const identity = page.split("_")[1].split(".")[0];
+        const url = dns + importPort + "/import" + identity.charAt(0).toUpperCase() + identity.slice(1);;
+        const file = document.getElementById("import-file").files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = async function(event) {
+                var content = event.target.result;
+                var rowsObj = [];
+                var headers = content.split("\n")[0].split(",");
+                var body = content.split("\n").slice(1);
+
+                for(var i = 0; i < body.length; i++) {
+                    var data = body[i].replace("\r","").split(",");
+                    var obj = {};
+                    for(var j = 0; j < data.length; j++) {
+                        if (j < 2) {
+                            obj[headers[j].trim()] = data[j].trim();
+                        }
+                    }
+                    rowsObj.push(obj);
+                }      
+                console.log(rowsObj);
+                let jsonObj = {"data": rowsObj}
+                const response = await fetch(url, {
+                    method: "POST",
+                    mode: "cors", 
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify(jsonObj)
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    throw new Error(errorMessage);
+                }
+                location.reload();
+            };
+            reader.onerror = function(event) {
+                defaultPointer();
+                console.log("error");
+                showModalAlert("import");
+            };
+            reader.readAsBinaryString(file);
+        }
+    });
+
+</script>

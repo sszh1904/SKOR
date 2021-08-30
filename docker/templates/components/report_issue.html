@@ -1,0 +1,79 @@
+<!-- Report Issue Button -->
+<button id="report-icon" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#report-issue"><img id="bug-img" src="images/bug.svg" alt="bug"></button>
+
+<!-- Report Issue Modal -->
+<div class="modal fade" id="report-issue" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="add-ta-label" aria-hidden="true">
+    <div class="vertical-alignment-helper">
+        <div class="modal-dialog vertical-align-center">
+            <form id="report-issue-form" action="#">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="report-issue-label">Report Bug/Issue</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">                    
+                        <div class="">
+                            <alert id="reportError-msg" class="alert-negative error-msg modal-alert"><img class="alert-icon" src="images/warning.svg" alt=""><c1>An error occurred when reporting bug/issue.</c1></alert>
+                            <alert id="reportSuccess-msg" class="alert-positive modal-alert"><img class="alert-icon" src="images/tick.svg" alt=""><c1>Successfully reported bug/issue! Thank you.</c1></alert>
+                            <p>Noticed a bug/an issue? Let us know in the text box below. Thank you!</p>
+                            <label class="form-label" for="#issue"><overline>Description</overline></label>
+                            <textarea class="form-control" name="issueMessage" placeholder="What problem did you encounter?"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Report</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Resets modal inputs and alerts when modal closes
+        $('.modal').on('hidden.bs.modal', function (e) {
+        $(this)
+            .find("input,textarea")
+            .val('')
+            .end()
+        $('.modal-alert').hide();
+    });
+    
+    const reportIssueForm = document.getElementById("report-issue-form");
+    reportIssueForm.addEventListener("submit", async function(event) {
+        loadingPointer();
+        event.preventDefault();
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const plainFormData = Object.fromEntries(formData.entries());
+        const identity = sessionStorage.getItem("identity");
+        if (identity != null) {
+            const user = JSON.parse(sessionStorage.getItem(identity));
+            plainFormData.userName = user.name;
+            plainFormData.userEmail = user.email;
+        }
+        else {
+            plainFormData.userName = "Unknown";
+            plainFormData.userEmail = "Login page";
+        }
+        const jsonFormData = JSON.stringify(plainFormData); 
+        const reportIssueUrl = dns + contactSkorPort + "/reportIssue";
+        try {
+            const reportIssueData = await sendPostRequest(reportIssueUrl, jsonFormData);
+            if (reportIssueData.code == 200) {
+                defaultPointer();
+                showModalAlert("reportSuccess");
+            }
+            else {
+                defaultPointer();
+                showModalAlert("reportError");
+            }
+        } catch (error) {
+            defaultPointer();
+            console.log(error);
+            showModalAlert("reportError");
+        }
+    });
+
+</script>

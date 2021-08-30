@@ -296,17 +296,3 @@ services:
             PYTHONUNBUFFERED: 1
         ports:
             - "${CONTACT_SKOR_PORT}:${CONTACT_SKOR_PORT}"
-            
-    ###################################
-    # App_test microservice
-    ###################################
-    app_test:
-        build:
-            context: ./
-            dockerfile: app_test.Dockerfile
-        image: app_test:skor
-        restart: always
-        environment:
-            PYTHONUNBUFFERED: 1
-        ports:
-            - "${TEST_PORT}:${TEST_PORT}"
